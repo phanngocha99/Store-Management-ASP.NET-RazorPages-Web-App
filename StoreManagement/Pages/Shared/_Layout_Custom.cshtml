@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý cửa hàng</title>
+    <link rel="stylesheet" href="~/StoreManagement.styles.css" asp-append-version="true" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body style="overflow:hidden;margin:0">
+    <div class="wrapper">
+        <div class="header">
+            <div class="logo">
+                <i class='bx bx-store-alt'></i>
+                <span class="display">
+                    PHẦN MỀM QUẢN LÝ CỬA HÀNG
+                    <br>
+                    <span class="english">Store management application</span>
+                </span>
+            </div>
+
+            <div class="breadcrumbs">
+                <p>
+                    <span><a href="/@ViewData["BreadcrumbsParent"]">@ViewData["TitleParent"]</a></span>                    
+                    <span>/</span> 
+                    <span><a href="/@ViewData["BreadcrumbsCurrent"]">@ViewData["TitleCurrent"]</a></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <ul>
+                <li>
+                    <a href="">
+                        <i class='bx bx-power-off'></i>
+                        <span class="display">
+                            Đăng ký  <br>
+                            <span class="english"> Sign In</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        <i class='bx bx-right-arrow'></i>
+                        <span class="display">
+                            Đăng nhập  <br>
+                            <span class="english"> Log In</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <a href="/Index">
+                        <i class='bx bx-box'></i>
+                        <span class="display">
+                            Sản phẩm  <br>
+                            <span class="english"> Product</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Error">
+                        <i class='bx bx-category-alt'></i>
+                        <span class="display">
+                            Loại sản phẩm  <br>
+                            <span class="english"> Category</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        <i class='bx bx-receipt'></i>
+                        <span class="display">
+                            Hóa đơn bán hàng  <br>
+                            <span class="english"> Sales Invoice</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        <i class='bx bx-archive-in'></i>
+                        <span class ="display">
+                            Hóa đơn nhập hàng  <br>
+                            <span class="english"> Inputs Invoice</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        <i class='bx bx-bar-chart'></i>
+                        <span class="display">
+                            Thống kê số hàng còn lại theo sản phẩm  <br>
+                            <span class="english"> Statistics of remaining quantity by product</span>
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        <i class='bx bxs-dashboard'></i>
+                        <span class="display">
+                            Thống kê số hàng cũ đã hết hàng sử dụng
+                            <br>
+                            <span class="english"> Statistics on the number of old goods that are out of stock</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

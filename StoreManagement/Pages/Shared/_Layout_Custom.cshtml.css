@@ -1,0 +1,216 @@
+﻿.wrapper {
+    font-family: Arial, sans-serif;
+    background-color: #1F2937;
+    width: 100%;
+    height: 100%;
+}
+
+.header {
+    background-color: #1F2937;
+    color: #ffffff;
+    width: 100%;
+}
+
+.logo {
+    float: left;
+    width: 25vw;
+    height: 10vh;
+    border-bottom: 1px solid transparent;
+    border-image: linear-gradient(90deg, #374151, #FBBF24, #374151);
+    border-image-slice: 1;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+    .logo i {
+        color: #F59E0B;
+        font-size: 45px;
+        font-weight: bold;
+        margin-left: 25px;
+        margin-right: 20px;
+    }
+
+    .logo span {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        justify-content: left;
+    }
+
+.breadcrumbs {
+    border-left: solid 1px #374151;
+    float: none;
+    height: 10vh;
+    border-bottom: solid 1px #374151;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    font-size: 12px;
+}
+
+    .breadcrumbs p {
+        margin-left: 30px;
+        color: #D1D5DB;
+    }
+
+        .breadcrumbs p a {
+            color: #9CA3AF;
+            margin: 10px;
+            text-decoration: none;
+        }
+
+            .breadcrumbs p a:hover {
+                color: #F59E0B;
+            }
+
+.sidebar {
+    float: left;
+    width: 25vw;
+    background-color: #1F2937;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+    .sidebar ul {
+        list-style-type: none;
+        width: 25vw;
+        padding: 0;
+        border-top: solid 1px #374151;
+        margin: 0;
+    }
+
+    .sidebar li a {
+        color: #ffffff;
+        padding-left: 30px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-decoration: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+    }
+
+        .sidebar li a:hover {
+            background-color: #F59E0B;
+            border-radius: 10px;
+        }
+
+        .sidebar li a i {
+            margin-right: 20px;
+            font-size: 30px;
+        }
+
+        .sidebar li a span {
+            margin-top: 3px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+        }
+
+.english {
+    font-weight: lighter;
+    color: #9CA3AF !important;
+    font-size: 12px;
+}
+
+.sidebar li a:hover .english, .sidebar li a.hover .english {
+    color: #ffffff !important;
+}
+
+.container {
+    color: #ffffff;
+    float: none;
+    background-color: #111827;
+    border-left: solid 1px #374151;
+    overflow: hidden;
+}
+
+    .container main {
+        margin: 30px;
+        font-family: Arial, sans-serif;
+        width: 75vw;
+        height: 90vh;
+    }
+
+.display {
+    display: flex !important;
+}
+
+/*Responsive*/
+@media only screen and (max-width: 1140px) {
+    .display {
+        display: none !important;
+    }
+
+    .logo {
+        width: 70px;
+    }
+
+        .logo i {
+            font-size: 30px;
+        }
+
+    .sidebar, .sidebar ul {
+        width: 70px;
+    }
+
+        .sidebar li a i {
+            margin-right: 5px;
+            font-size: 15px;
+        }
+
+    .breadcrumbs {
+        font-size: 10px;
+    }
+
+        .breadcrumbs p {
+            margin-left: 10px;
+        }
+
+    .container main {
+        margin: 15px;
+        width:90vw;
+        height: 90vh;
+    }
+}
+
+@media only screen and (max-height: 560px) {
+    .display {
+        display: none !important;
+    }
+
+    .logo {
+        width: 70px;
+    }
+
+        .logo i {
+            font-size: 30px;
+        }
+
+    .sidebar {
+        width: 70px;
+    }
+
+        .sidebar li a i {
+            margin-right: 5px;
+            font-size: 15px;
+        }
+
+    .breadcrumbs {
+        font-size: 10px;
+    }
+
+        .breadcrumbs p {
+            margin-left: 10px;
+        }
+
+    .container main {
+        margin: 15px;
+        width: 90vw;
+        height: 90vh;
+    }
+}

@@ -1,0 +1,318 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.Delete_ProductModel
+@{
+    Product deleteProduct;
+    int productId = int.Parse(Request.Query["productId"]);
+    deleteProduct = Product_Logic.FindProductById(productId);
+    string confirmDelete;
+    bool deletedProduct = false;
+    bool validProductIdResult = true;
+    string messageValidProduct = "";
+
+
+    if (string.IsNullOrEmpty(deleteProduct.Name))
+    {
+        messageValidProduct = $"Mã sản phẩm không tồn tại";
+        validProductIdResult = false;
+    } else
+    {
+        if (Request.Method == "POST")
+        {
+            confirmDelete = Request.Form["deleteProduct"];
+            if (confirmDelete == "Đúng")
+            {
+                deletedProduct = Product_Logic.DeleteProduct(productId);
+            }
+        }
+    }
+    
+}
+
+@{
+    ViewData["TitleParent"] = "Sản phẩm";
+    ViewData["BreadcrumbsParent"] = "Index";
+    ViewData["TitleCurrent"] = "Xóa sản phẩm";
+    ViewData["BreadcrumbsCurrent"] = "Delete_Product?productId=" + productId;
+}
+
+<div class="content">
+    <div class="top">
+        <div class="title">XÓA SẢN PHẨM</div>
+    </div>
+
+    @if (!validProductIdResult)
+    {
+        <div class="valid_product_notification">
+            <div class="valid_product_notification_note">
+                <i class='bx bx-info-circle'></i><p class="validProduct">@messageValidProduct</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (!deletedProduct)
+        {
+            <div class="delete_product_notification">
+                <div class="delete_product_notification_note">
+                    <i class='bx bx-info-circle'></i><p>Bạn chắn chắn muốn xóa sản phẩm này?</p>
+                </div>
+                <div class="confirm_delete_product">
+                    <form method="POST">
+                        <input type="submit" id="deleteProduct" name="deleteProduct" value="Đúng"><br>
+                    </form>
+                    <a href="/Index">Không</a>
+                </div>
+            </div>
+            <div class="product">
+                <form>
+                    <label for="productId">Mã sản phẩm: </label><br>
+                    <input type="number" id="productId" name="productId" value="@deleteProduct.Id" readonly><br>
+                    <label for="productName">Tên sản phẩm: </label><br>
+                    <input type="text" id="productName" name="productName" value="@deleteProduct.Name" readonly><br>
+                    <label for="productExpireDate">Ngày hết hạn: </label><br>
+                    <input type="date" id="productExpireDate" name="productExpireDate" value="@deleteProduct.ExpiredDate" readonly><br>
+                    <label for="productCompany">Công ty: </label><br>
+                    <input type="text" id="productCompany" name="productCompany" value="@deleteProduct.Company" readonly><br>
+                    <label for="productManufactureDate">Ngày sản xuất: </label><br>
+                    <input type="date" id="productManufactureDate" name="productManufactureDate" value="@deleteProduct.ManufactureDate" readonly><br>
+                    <label for="productCategory">Loại hàng: </label><br>
+                    <input type="text" id="productCategory" name="productCategory" value="@deleteProduct.Category" readonly><br>
+                    <label for="productPrice">Giá: </label><br>
+                    <input type="number" id="productPrice" name="productPrice" value="@deleteProduct.Price" readonly><br>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="delete_success_product_notification">
+                <div class="delete_success_product_notification_note">
+                    <i class='bx bx-info-circle'></i><p>Đã xóa sản phẩm thành công</p>
+                </div>
+                <a href="/Index">OK</a>
+            </div>
+        }
+    }
+    
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .product {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        margin: 10px;
+        border-radius: 20px;
+        padding-top: 15px;
+        font-size: 12px;
+        width: 60vw;
+        height: 65vh;
+        overflow: auto;
+    }
+
+        .product form {
+            width: 50vw;
+            height: 62vh;
+            overflow: auto;
+        }
+
+        .product label {
+            margin-top: 10px;
+            font-weight: bold;
+            width: 45vw;
+        }
+
+        .product input {
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding-left: 10px;
+            width: 45vw;
+            height: 30px;
+            background-color: #9CA3AF50;
+            border: 1px solid #374151;
+            border-radius: 5px;
+            margin: 5px 5px 10px 0px;
+            cursor: not-allowed;
+        }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #D97706 !important;
+        }
+
+    .delete_product_notification {
+        background: #1F2937;
+        padding: 5px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 5px;
+        width: 60vw;
+    }
+
+    .delete_product_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .delete_product_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .confirm_delete_product {
+        display: flex;
+        gap: 20px;
+    }
+
+        .confirm_delete_product #deleteProduct{
+            width:75px;
+            height:25px;
+            border-radius: 5px;
+            background-color: #D97706;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            border:none;
+            font-size: 14px;
+
+        }
+
+    .delete_product_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    .delete_success_product_notification {
+        background: #1F2937;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #00ff00;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60vw;
+        margin-top: 5px;
+    }
+
+
+    .delete_success_product_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .delete_success_product_notification_note .bx-info-circle {
+            color: #00ff00;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .delete_success_product_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #00ff00;
+        color: #000000;
+        font-weight: bold;
+    }
+
+
+    .valid_product_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 12vh;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .valid_product_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .valid_product_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .valid_product_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    .validProduct {
+        font-style: italic;
+        color: #D97706;
+    }
+
+
+    /*Responsive*/
+
+    @@media only screen and (max-height: 560px) {
+        .product {
+            height: 40vh;
+        }
+    }
+
+</style>
+

@@ -1,0 +1,53 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = StoreManagement
+build_property.RootNamespace = StoreManagement
+build_property.ProjectDir = E:\1. iamenjoying\2023-now\cntt\cntt hcmus\mon-hoc\6.ky-thuat-lap-trinh\23880020\StoreManagement\StoreManagement\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = E:\1. iamenjoying\2023-now\cntt\cntt hcmus\mon-hoc\6.ky-thuat-lap-trinh\23880020\StoreManagement\StoreManagement
+build_property._RazorSourceGeneratorDebug = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Add_Product.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRkX1Byb2R1Y3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-wdendk84re
+
+[E:/1. iamenjoying/2023-now/cntt/cntt hcmus/mon-hoc/6.ky-thuat-lap-trinh/23880020/StoreManagement/StoreManagement/Pages/Shared/_Layout_Custom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXRfQ3VzdG9tLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = b-p0uxtks7mo

@@ -1,0 +1,313 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.Add_ProductModel
+@{
+    ViewData["TitleParent"] = "Sản phẩm";
+    ViewData["BreadcrumbsParent"] = "Index";
+    ViewData["TitleCurrent"] = "Thêm sản phẩm";
+    ViewData["BreadcrumbsCurrent"] = "Add_Product";
+}
+
+@{
+    Product newProduct;
+    bool addProductResult = false;
+    bool validProductResult = true;
+    string messageValidProduct = "";
+    string productId = "";
+    string productName = "";
+    string productExpireDate = "";
+    string productCompany = "";
+    string productManufactureDate = "";
+    string productCategory = "";
+    string productPrice = "";
+    string[] productInfo = new string[] { productId, productName, productExpireDate, productCompany, productManufactureDate, productCategory, productPrice };
+    string[] productLabel = new string[] { "Mã sản phẩm", "Tên sản phẩm", "Ngày hết hạn", "Công ty", "Ngày sản xuất", "Loại hàng", "Giá" };
+
+    if (Request.Method == "POST")
+    {
+        productId = Request.Form["productId"];
+        productName = Request.Form["productName"];
+        productExpireDate = Request.Form["productExpireDate"];
+        productCompany = Request.Form["productCompany"];
+        productManufactureDate = Request.Form["productManufactureDate"];
+        productCategory = Request.Form["productCategory"];
+        productPrice = Request.Form["productPrice"];
+
+        productInfo = new string[] { productId, productName, productExpireDate, productCompany, productManufactureDate, productCategory, productPrice };
+
+
+        for (int i = productInfo.Length -1; i > -1; i--)
+        {
+            if (Product_Logic.IsNotValidString(productInfo[i]))
+            {
+                messageValidProduct = $"{productLabel[i]} chưa được điền!";
+                validProductResult = false;
+            }
+        }
+
+        if (validProductResult)
+        {
+            if (Product_Logic.IsNotValidNumber(int.Parse(productId)))
+            {
+                messageValidProduct = "Mã sản phẩm phải là số dương";
+                validProductResult = false;
+            }
+
+            if (Product_Logic.IsNotValidNumber(int.Parse(productPrice)))
+            {
+                messageValidProduct = "Giá phải là số dương!";
+                validProductResult = false;
+            }
+
+            if (Product_Logic.IsNotUnitProductId(int.Parse(productId)))
+            {
+                messageValidProduct = "Mã sản phẩm đã tồn tại!";
+                validProductResult = false;
+            }
+        }
+        
+
+        if (validProductResult)
+        {
+            newProduct.Id = int.Parse(productId);
+            newProduct.Name = productName;
+            newProduct.ExpiredDate = productExpireDate;
+            newProduct.Company = productCompany;
+            newProduct.ManufactureDate = productManufactureDate;
+            newProduct.Category = productCategory;
+            newProduct.Price = int.Parse(productPrice);
+            addProductResult = Product_Logic.AddProduct(newProduct);
+        }
+    }
+}
+
+<div class="content">
+    <div class="top">
+        <div class="title">THÊM SẢN PHẨM</div>
+    </div>
+    <div class="product">
+        <form method="POST">
+            <label for="productId">Mã sản phẩm: </label><span class="validInput">(Mã sản phẩm chỉ có thể là số)</span><br>
+            <input type="number" id="productId" name="productId" value="@productInfo[0]"><br>
+            <label for="productName">Tên sản phẩm: </label><br>
+            <input type="text" id="productName" name="productName" value="@productInfo[1]"><br>
+            <label for="productExpireDate">Ngày hết hạn: </label><br>
+            <input type="date" id="productExpireDate" name="productExpireDate" value="@productInfo[2]"><br>
+            <label for="productCompany">Công ty: </label><br>
+            <input type="text" id="productCompany" name="productCompany" value="@productInfo[3]"><br>
+            <label for="productManufactureDate">Ngày sản xuất: </label><br>
+            <input type="date" id="productManufactureDate" name="productManufactureDate" value="@productInfo[4]"><br>
+            <label for="productCategory">Loại hàng: </label><br>
+            <input type="text" id="productCategory" name="productCategory" value="@productInfo[5]"><br>
+            <label for="productPrice">Giá: </label><span class="validInput">(Giá sản phẩm chỉ có thể là số)</span><br>
+            <input type="number" id="productPrice" name="productPrice" value="@productInfo[6]"><br>
+            <input class="submitBtn" type="submit" value="THÊM SẢN PHẨM">
+        </form>
+    </div>
+
+    @if (addProductResult)
+    {
+        <div class="new_product_notification">
+            <div class="new_product_notification_note">
+                <i class='bx bx-info-circle'></i><p>Đã thêm sản phẩm thành công</p>
+            </div>
+            <a href="/Index">OK</a>
+        </div>
+    }
+    @if (!validProductResult)
+    {
+        <div class="valid_product_notification">
+            <div class="valid_product_notification_note">
+                <i class='bx bx-info-circle'></i><p class="validProduct">@messageValidProduct</p>
+            </div>
+        </div>
+    }
+
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .product {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        margin: 10px;
+        border-radius: 20px;
+        padding-top: 15px;
+        font-size: 14px;
+        width: 60vw;
+        height: 75vh;
+        overflow: auto;
+    }
+
+        .product form {
+            width: 50vw;
+            height: 72vh;
+            overflow: auto;
+        }
+
+        .product label {
+            margin-top: 20px;
+            font-weight: bold;
+            width: 45vw;
+        }
+
+        .product .validInput {
+            font-style: italic;
+            color: #ffffff;
+        }
+        
+        .validProduct{
+            font-style:italic;
+            color: #D97706;
+        }
+
+        .product input {
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding-left: 10px;
+            width: 45vw;
+            height: 30px;
+            background-color: #9CA3AF50;
+            border: 1px solid #374151;
+            border-radius: 5px;
+            margin: 5px 5px 10px 0px;
+        }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #D97706 !important;
+        }
+
+    .new_product_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 12vh;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #00ff00;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .new_product_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .new_product_notification_note .bx-info-circle {
+            color: #00ff00;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .new_product_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #00ff00;
+        color: #000000;
+        font-weight: bold;
+    }
+
+
+    .valid_product_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 12vh;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .valid_product_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .valid_product_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .valid_product_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .new_product_notification {
+            top: 12vh;
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .new_product_notification {
+            top: 12vh;
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-height: 560px) {
+        .new_product_notification {
+            top: 20%;
+            left: 30%;
+        }
+    }
+
+</style>
+
+
