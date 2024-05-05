@@ -27,6 +27,7 @@
 
 @{
     Product newProduct;
+    Category[]? listCategories;
     bool addProductResult = false;
     bool validProductResult = true;
     string messageValidProduct = "";
@@ -39,6 +40,7 @@
     string productPrice = "";
     string[] productInfo = new string[] { productId, productName, productExpireDate, productCompany, productManufactureDate, productCategory, productPrice };
     string[] productLabel = new string[] { "Mã sản phẩm", "Tên sản phẩm", "Ngày hết hạn", "Công ty", "Ngày sản xuất", "Loại hàng", "Giá" };
+    listCategories = Category_Data.ReadListCategory();
 
     if (Request.Method == "POST")
     {
@@ -53,7 +55,7 @@
         productInfo = new string[] { productId, productName, productExpireDate, productCompany, productManufactureDate, productCategory, productPrice };
 
 
-        for (int i = productInfo.Length -1; i > -1; i--)
+        for (int i = productInfo.Length - 1; i > -1; i--)
         {
             if (Product_Logic.IsNotValidString(productInfo[i]))
             {
@@ -87,7 +89,7 @@
         {
             if (Product_Logic.IsNotContainBlankSpaceProductId(productId))
             {
-                messageValidProduct = "Mã sản phẩm phải là số dương";
+                messageValidProduct = "Mã sản phẩm không được chứa khoảng cách";
                 validProductResult = false;
             }
         }
@@ -100,7 +102,7 @@
                 validProductResult = false;
             }
         }
-        
+
 
         if (validProductResult)
         {
@@ -128,7 +130,8 @@
             </div>
             <a href="/List_Product?User=@userGlobal">OK</a>
         </div>
-    } else
+    }
+    else
     {
         @if (!validProductResult)
         {
@@ -150,8 +153,13 @@
                 <input type="text" id="productCompany" name="productCompany" value="@productInfo[3]"><br>
                 <label for="productManufactureDate">Ngày sản xuất: </label><br>
                 <input type="date" id="productManufactureDate" name="productManufactureDate" value="@productInfo[4]"><br>
-                <label for="productCategory">Loại hàng: </label><br>
-                <input type="text" id="productCategory" name="productCategory" value="@productInfo[5]"><br>
+                <label for="productCategory">Loại hàng: </label><span class="validInput">(Tạo mới loại hàng tại <a href="/Add_Category?User=@userGlobal">ĐÂY</a>)</span><br>
+                <select name="productCategory" id="productCategory">
+                    @for (int i = 0; i < listCategories.Length; i++)
+                    {
+                        <option value="@listCategories[i].Name"> @listCategories[i].Name </option>
+                    }
+                </select><br>
                 <label for="productPrice">Giá: </label><span class="validInput">(Giá sản phẩm chỉ có thể là số)</span><br>
                 <input type="number" id="productPrice" name="productPrice" value="@productInfo[6]"><br>
                 <input class="submitBtn" type="submit" value="THÊM SẢN PHẨM">
@@ -209,23 +217,44 @@
             font-style: italic;
             color: #ffffff;
         }
-        
-        .validProduct{
-            font-style:italic;
-            color: #D97706;
+
+    .validProduct {
+        font-style: italic;
+        color: #D97706;
+    }
+
+    .product input {
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        padding-left: 10px;
+        width: 45vw;
+        height: 30px;
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 5px;
+        margin: 5px 5px 10px 0px;
+    }
+
+    .product select {
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 10px;
+        color: #ffffff;
+        height: 30px;
+        margin: 5px;
+        margin-bottom: 10px;
+    }
+
+        .product select option {
+            background-color: #000000;
+            color: #ffffff;
         }
 
-        .product input {
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            padding-left: 10px;
-            width: 45vw;
-            height: 30px;
-            background-color: #9CA3AF50;
-            border: 1px solid #374151;
-            border-radius: 5px;
-            margin: 5px 5px 10px 0px;
-        }
+    .product .validInput a {
+        background-color: #000000;
+        color: #D97706;
+    }
+
 
     .submitBtn {
         background-color: #D97706 !important;

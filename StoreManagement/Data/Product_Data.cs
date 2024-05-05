@@ -68,6 +68,23 @@ namespace StoreManagement.Data
                 file.WriteLine(line);
             }
             file.Close();
+
+            Category[] listCategories = Category_Data.ReadListCategory();
+            for (int i = 0; i < listCategories.Length; i++)
+            {
+                int count = 0 ;
+                for (int j = 0; j < listProducts.Length; j++)
+                {
+                    if (listProducts[j].Category.Equals(listCategories[i].Name))
+                    {
+                        count++;
+                    }
+                }
+                listCategories[i].Quantity = count;
+            }
+            const string pathCategory = "\\Files\\Category.txt";
+            Category_Data.SaveCategories(pathCategory, listCategories);
+
         }
     }
 }

@@ -1,0 +1,393 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@model StoreManagement.Pages.List_CategoryModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+@{
+    ViewData["TitleParent"] = "Loại hàng";
+    ViewData["BreadcrumbsParent"] = "List_Category?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Danh sách loại hàng";
+    ViewData["BreadcrumbsCurrent"] = "List_Category?User=" + userGlobal;
+}
+@{
+    Category[]? listCategories;
+    string keySearch = string.Empty;
+    string searchFor = string.Empty;
+    string select = string.Empty; ;
+    string[] categoryInfo = new string[] { "Mã Loại Hàng", "Tên loại hàng" };
+    if (Request.Method == "POST")
+    {
+        keySearch = Request.Form["keySearch"];
+        searchFor = Request.Form["searchFor"];
+
+        if (string.IsNullOrEmpty(keySearch))
+        {
+            listCategories = Category_Data.ReadListCategory();
+        }
+        else
+        {
+            switch (searchFor)
+            {
+                case "Tên loại hàng":
+                    listCategories = Category_Logic.FindCategoriesByName(keySearch);
+                    break;
+                case "Mã loại hàng":
+                    listCategories = Category_Logic.FindCategoriesById(keySearch);
+                    break;
+                default:
+                    listCategories = Category_Logic.FindCategoriesById(keySearch);
+                    break;
+            }
+        }
+    }
+    else
+    {
+        listCategories = Category_Data.ReadListCategory();
+    }
+}
+
+
+@*HTML*@
+<div class="content">
+    <div class="top">
+        <div class="title">
+            DANH SÁCH LOẠI HÀNG
+            <div class="note">(Kéo lên-xuống, trái-phải để xem đầy đủ thông tin bảng)</div>
+        </div>
+        <a class="add_category" href="/Add_Category?User=@userGlobal">
+            <span>Thêm loại hàng</span>
+        </a>
+    </div>
+    <div class="list">
+        <form method="POST" class="search">
+            <p> Tìm kiếm theo </p>
+            <select name="searchFor" id="searchFor">
+                @for (int i = 0; i < categoryInfo.Length; i++)
+                {
+                    if (categoryInfo[i] == searchFor)
+                    {
+                        <option value="@categoryInfo[i]" selected> @categoryInfo[i] </option>
+                    }
+                    else
+                    {
+                        <option value="@categoryInfo[i]"> @categoryInfo[i] </option>
+                    }
+                }
+            </select>
+            <p> : </p>
+            <input type="text" class="searchbar" placeholder="Tìm kiếm..." name="keySearch" value="@keySearch" />
+            <input class="button" type="submit" value="Ấn để tìm kiếm">
+        </form>
+        <table>
+            <tr>
+                <th>Mã loại hàng</th>
+                <th>Tên loại hàng</th>
+                <th>Số lượng sản phẩm thuộc loại hàng này</th>
+                <th>Sửa</th>
+                <th>Xóa</th>
+            </tr>
+            @if (listCategories != null)
+            {
+                @foreach (var category in listCategories)
+                {
+                    <tr>
+                        <td>@category.Id</td>
+                        <td>@category.Name</td>
+                        <td>@category.Quantity</td>
+                        <td>
+                            <a href="/Edit_Category?categoryId=@category.Id&User=@userGlobal" class="edit"><i class='bx bxs-message-square-edit'></i>Sửa</a>
+                        </td>
+                        <td>
+                            <a href="/Delete_Category?categoryId=@category.Id&User=@userGlobal" class="delete"><i class='bx bxs-message-square-x'></i>Xóa</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+
+        @if (listCategories != null)
+        {
+            <div class="endtable">
+                <span>Tổng số loại hàng:</span>&nbsp;&nbsp;&nbsp;<span>@listCategories.Length</span>
+            </div>
+        }
+        else
+        {
+            <div class="endtable">
+                <span>Tổng số loại hàng:</span>&nbsp;&nbsp;&nbsp;<span>0</span>
+            </div>
+        }
+    </div>
+</div>
+
+
+@*CSS*@
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 100vw;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .top .note {
+            font-size: 10px;
+            font-weight: lighter;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .top .add_category {
+            background-color: #D97706;
+            padding: 7px;
+            border: none;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .top .add_category:hover {
+                background-color: #F59E0B;
+            }
+
+            .top .add_category span {
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                padding-left: 10px;
+                font-size: 14px;
+                font-weight: bold;
+                padding-left: 5px;
+            }
+
+    .list {
+        width: 75vw;
+        max-height: 65vh;
+        font-size: 12px;
+        margin-top: 30px;
+        overflow: auto
+    }
+
+        .list table {
+            width: 70vw;
+            height: auto;
+            border-collapse: collapse;
+            background-color: #1F2937;
+        }
+
+        .list td, th {
+            border-bottom: 1px solid #374151;
+            text-align: center;
+            padding: 15px 10px;
+            height: auto;
+        }
+
+        .list td {
+            background-color: #1F2937;
+            font-weight: lighter;
+            font-size: 12px;
+        }
+
+        .list .search {
+            height: 50px;
+            width: 70vw;
+            background-color: #1F2937;
+            border-bottom: 1px solid #374151;
+            border-top: 1px solid #374151;
+            border-radius: 10px 10px 0px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+            .list .search p {
+                font-weight: bold;
+            }
+
+            .list .search select {
+                background-color: #9CA3AF50;
+                border: 1px solid #374151;
+                border-radius: 10px;
+                color: #ffffff;
+                height: 30px;
+            }
+
+                .list .search select option {
+                    background-color: #000000;
+                    color: #ffffff;
+                }
+
+
+            .list .search .button {
+                background-color: #D97706;
+                padding: 5px;
+                border: none;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 10px;
+                cursor: pointer;
+                padding: 9px;
+                font-weight: bold;
+            }
+
+                .list .search .button:hover {
+                    background-color: #F59E0B;
+                }
+
+            .list .search input {
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                padding-left: 10px;
+                font-size: 12px;
+            }
+
+        .list .searchbar {
+            width: 40%;
+            height: 30px;
+            background-color: #9CA3AF50;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+
+
+        .list .edit {
+            color: #D97706;
+            padding: 5px 0px;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+            .list .edit:hover {
+                background-color: #ffffff;
+            }
+
+            .list .edit i {
+                margin-right: 5px;
+                font-size: 20px;
+            }
+
+        .list .delete {
+            color: #ff0000;
+            padding: 5px 0px;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+            .list .delete:hover {
+                background-color: #ffffff;
+            }
+
+            .list .delete i {
+                margin-right: 5px;
+                font-size: 20px;
+            }
+
+        .list .endtable {
+            height: 50px;
+            width: 70vw;
+            background-color: #1F2937;
+            border-bottom: 1px solid #374151;
+            border-radius: 0px 0px 10px 10px;
+            color: #ffffff;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+    .display-none {
+        display: none !important;
+    }
+
+    /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .top, .list, .list table, .list .search, .list .endtable {
+            width: 85vw;
+        }
+
+            .list .search, .list .endtable {
+                min-width: 558.225px;
+            }
+
+            .top .title {
+                margin-left: 5px;
+            }
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .list .search, .list .endtable, .list table {
+            width: 558.225px;
+        }
+
+        .top .title {
+            margin-left: 5px;
+        }
+    }
+
+    @@media only screen and (max-height: 560px) {
+        .top, .list, .list table, .list .search, .list .endtable {
+            width: 85vw;
+        }
+
+            .list .search, .list .endtable {
+                min-width: 558.225px;
+            }
+
+            .top .title {
+                margin-left: 5px;
+            }
+    }
+
+</style>

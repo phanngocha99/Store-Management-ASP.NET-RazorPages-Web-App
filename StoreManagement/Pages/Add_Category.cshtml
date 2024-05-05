@@ -1,0 +1,320 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.Add_CategoryModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+@{
+    ViewData["TitleParent"] = "Loại hàng";
+    ViewData["BreadcrumbsParent"] = "List_Category?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Thêm loại hàng";
+    ViewData["BreadcrumbsCurrent"] = "Add_Category?User=" + userGlobal;
+}
+
+@{
+    Category newCategory;
+    bool addResult = false;
+    bool validResult = true;
+    string messageValid = "";
+    string categoryId = "";
+    string categoryName = "";
+    string categoryQuantity = "";
+    string[] categoryInfo = new string[] { categoryId, categoryName, categoryQuantity };
+    string[] categoryLabel = new string[] { "Mã loại hàng" , "Tên loại hàng", "Số lượng"};
+
+    if (Request.Method == "POST")
+    {
+        categoryId = Request.Form["categoryId"];
+        categoryName = Request.Form["categoryName"];
+        categoryQuantity = "0";
+
+        categoryInfo = new string[] { categoryId, categoryName, categoryQuantity };
+
+
+        for (int i = categoryInfo.Length - 1; i > -1; i--)
+        {
+            if (Category_Logic.IsNotValidString(categoryInfo[i]))
+            {
+                messageValid = $"{categoryLabel[i]} chưa được điền!";
+                validResult = false;
+            }
+        }
+
+        if (validResult)
+        {
+            if (Category_Logic.IsNotValidNumber(int.Parse(categoryId)))
+            {
+                messageValid = "Mã loại hàng phải là số dương";
+                validResult = false;
+            }
+
+            if (Category_Logic.IsNotUniqueId(int.Parse(categoryId)))
+            {
+                messageValid = "Mã loại hàng đã tồn tại!";
+                validResult = false;
+            }
+        }
+
+        if (validResult)
+        {
+            if (Product_Logic.IsNotContainBlankSpaceProductId(categoryId))
+            {
+                messageValid = "Mã sản phẩm không được chứa khoảng cách";
+                validResult = false;
+            }
+        }
+
+        if (validResult)
+        {
+
+            if (Category_Logic.IsNotUniqueCategoryName(categoryName.Trim()))
+            {
+                messageValid = "Loại hàng đã tồn tại!";
+                validResult = false;
+            }
+        }
+
+        if (validResult)
+        {
+            newCategory.Id = int.Parse(categoryId);
+            newCategory.Name = categoryName.Trim();
+            newCategory.Quantity = 0;
+            addResult = Category_Logic.AddCategory(newCategory);
+        }
+    }
+}
+
+<div class="content">
+    <div class="top">
+        <div class="title">THÊM LOẠI HÀNG</div>
+    </div>
+    @if (addResult)
+    {
+        <div class="new_notification">
+            <div class="new_notification_note">
+                <i class='bx bx-info-circle'></i><p>Đã thêm loại hàng thành công</p>
+            </div>
+            <a href="/List_Category?User=@userGlobal">OK</a>
+        </div>
+    }
+    else
+    {
+        @if (!validResult)
+        {
+            <div class="valid_notification">
+                <div class="valid_notification_note">
+                    <i class='bx bx-info-circle'></i><p class="valid">@messageValid</p>
+                </div>
+            </div>
+        }
+        <div class="add">
+            <form method="POST">
+                <label for="categoryId">Mã loại hàng: </label><br>
+                <input type="number" id="categoryId" name="categoryId" value="@categoryInfo[0]"><br>
+                <label for="categoryName">Tên loại hàng: </label><br>
+                <input type="text" id="categoryName" name="categoryName" value="@categoryInfo[1]"><br>
+                <label for="categoryQuantity">Số lượng: </label><span class="validInput">(Vì loại hàng mới được tạo nên chưa có sản phẩm nào thuộc loại hàng)</span><br>
+                <input type="number" id="categoryQuantity" name="categoryQuantity" value="0" readonly><br>
+                <input class="submitBtn" type="submit" value="THÊM LOẠI HÀNG">
+            </form>
+        </div>
+    }
+</div>
+<style>
+    #categoryQuantity{
+        cursor: none;
+    }
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .add {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        margin: 10px;
+        border-radius: 20px;
+        padding-top: 15px;
+        font-size: 14px;
+        width: 60vw;
+        height: 75vh;
+        overflow: auto;
+    }
+
+        .add form {
+            width: 50vw;
+            height: 72vh;
+            overflow: auto;
+        }
+
+        .add label {
+            margin-top: 20px;
+            font-weight: bold;
+            width: 45vw;
+        }
+
+        .add .validInput {
+            font-style: italic;
+            color: #ffffff;
+        }
+
+    .valid {
+        font-style: italic;
+        color: #D97706;
+    }
+
+    .add input {
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        padding-left: 10px;
+        width: 45vw;
+        height: 30px;
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 5px;
+        margin: 5px 5px 10px 0px;
+    }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #D97706 !important;
+        }
+
+    .new_notification {
+        background: #1F2937;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #00ff00;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60vw;
+        margin-top: 5px;
+    }
+
+    .new_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .new_notification_note .bx-info-circle {
+            color: #00ff00;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .new_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #00ff00;
+        color: #000000;
+        font-weight: bold;
+    }
+
+
+    .valid_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .valid_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .valid_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .valid_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-height: 560px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+</style>
+
+

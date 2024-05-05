@@ -364,6 +364,46 @@ namespace StoreManagement.Logic
             }
             
             return false;
-        }  
+        }
+
+        public static Product[] UpdateListProductsByCategory(string currentCategoryName, string newcategoryName)
+        {
+            Product[] listProducts = Product_Data.ReadListProduct();
+
+            for (int i = 0; i < listProducts.Length; i++)
+            {
+                if (listProducts[i].Category.Trim().Equals(currentCategoryName.Trim()))
+                {
+                    listProducts[i].Category = newcategoryName.Trim();
+                }
+            }
+
+            const string path = "\\Files\\Product.txt";
+            Product_Data.SaveProducts(path, listProducts);
+
+            return listProducts;
+        }
+
+        public static Product[] DeleteProductsByCategory(string currentCategoryName)
+        {
+
+            Product[] listProducts = Product_Data.ReadListProduct();
+            Product[] newListProducts = new Product[listProducts.Length - 1];
+
+            int j = 0;
+            for (int i = 0; i < listProducts.Length; i++)
+            {
+                if (listProducts[i].Category != currentCategoryName)
+                {
+                    newListProducts[j] = listProducts[i];
+                    j++;
+                }
+            }
+
+            const string path = "\\Files\\Product.txt";
+            Product_Data.SaveProducts(path, newListProducts);
+
+            return listProducts;
+        }
     }
 }

@@ -21,6 +21,8 @@
 @{
     Product editProduct;
     Product newEditProduct;
+    Category[]? listCategories;
+
     int currentProductId = int.Parse(Request.Query["productId"]);
     editProduct = Product_Logic.FindProductById(currentProductId);
 
@@ -38,6 +40,7 @@
     string productPrice = "";
     string[] productInfo = new string[] { productId, productName, productExpireDate, productCompany, productManufactureDate, productCategory, productPrice };
     string[] productLabel = new string[] { "Mã sản phẩm", "Tên sản phẩm", "Ngày hết hạn", "Công ty", "Ngày sản xuất", "Loại hàng", "Giá" };
+    listCategories = Category_Data.ReadListCategory();
 
 
     if (string.IsNullOrEmpty(editProduct.Name))
@@ -163,9 +166,13 @@
                     <input type="text" id="productCompany" name="productCompany" value="@editProduct.Company"><br>
                     <label for="productManufactureDate">Ngày sản xuất: </label><br>
                     <input type="date" id="productManufactureDate" name="productManufactureDate" value="@editProduct.ManufactureDate"><br>
-                    <label for="productCategory">Loại hàng: </label><br>
-                    <input type="text" id="productCategory" name="productCategory" value="@editProduct.Category"><br>
-                    <label for="productPrice">Giá: </label><span class="validInput">(Mã sản phẩm chỉ có thể là số)</span><br>
+                    <label for="productCategory">Loại hàng: </label><span class="validInput">(Tạo mới loại hàng tại <a href="/Add_Category?User=@userGlobal">ĐÂY</a>)</span><br>
+                    <select name="productCategory" id="productCategory">
+                        @for (int i = 0; i < listCategories.Length; i++)
+                        {
+                            <option value="@listCategories[i].Name"> @listCategories[i].Name </option>
+                        }
+                    </select><br>                    <label for="productPrice">Giá: </label><span class="validInput">(Mã sản phẩm chỉ có thể là số)</span><br>
                     <input type="number" id="productPrice" name="productPrice" value="@editProduct.Price"><br>
                     <input class="submitBtn" type="submit" value="SỬA SẢN PHẨM">
                 </form>
@@ -249,6 +256,26 @@
             border: 1px solid #374151;
             border-radius: 5px;
             margin: 5px 5px 10px 0px;
+        }
+
+        .product select {
+            background-color: #9CA3AF50;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            color: #ffffff;
+            height: 30px;
+            margin: 5px;
+            margin-bottom: 10px;
+        }
+
+            .product select option{
+                background-color: #000000;
+                color: #ffffff;
+            }
+
+        .product .validInput a {
+            background-color: #000000;
+            color: #D97706;
         }
 
     .submitBtn {
