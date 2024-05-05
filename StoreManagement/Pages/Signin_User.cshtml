@@ -2,7 +2,7 @@
 @using StoreManagement.Entities;
 @using StoreManagement.Logic;
 @using System.Web;
-@model StoreManagement.Pages.IndexModel
+@model StoreManagement.Pages.Signin_UserModel
 
 @{
     string userGlobal = Request.Query["User"];
@@ -128,15 +128,16 @@
             newUser.UserName = userName.Trim();
             newUser.Password = password.Trim();
             addUserResult = User_Logic.AddUser(newUser);
-            ViewData["User"] = userName.Trim();
+            ViewData["User"] = newUser.UserName;
+            userGlobal = newUser.UserName;
         }
     }
 }
 @{
     ViewData["TitleParent"] = "Người dùng";
-    ViewData["BreadcrumbsParent"] = "Signin_User/User=" + userName.Trim();
-    ViewData["TitleCurrent"] = "Đăng ký";
-    ViewData["BreadcrumbsCurrent"] = "Signin_User/User=" + userName.Trim();
+    ViewData["BreadcrumbsParent"] = "Signin_User?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Đăng nhập";
+    ViewData["BreadcrumbsCurrent"] = "Signin_User?User=" + userGlobal;
 }
 
 <div class="content">
@@ -144,9 +145,9 @@
     {
         <div class="new_user_notification">
             <div class="new_user_notification_note">
-                <i class='bx bx-info-circle'></i><p>Đã đăng ký thành công!</p>
+                <i class='bx bx-info-circle'></i><p>Đã đăng ký thành công! Vui lòng đăng nhập!</p>
             </div>
-            <a href="/List_Product?User=@userName.Trim()">OK</a>
+            <a href="/List_Product?User=@userGlobal">OK</a>
         </div>
     }
     else
@@ -182,6 +183,8 @@
                 <input type="password" id="password" name="password" value="@password"><br>
                 <input class="submitBtn" type="submit" value="ĐĂNG KÝ">
             </form>
+            <div> Đã có tài khoản?</div>
+            <a href="/Login_User?User=@userGlobal">ĐĂNG NHẬP</a>
         </div>
     }
 </div>
@@ -260,6 +263,30 @@
     }
 
         .submitBtn:hover {
+            background-color: #F59E0B !important;
+        }
+
+
+    .user a {
+        background-color: #D97706 !important;
+        padding: 5px !important;
+        border-radius: 5px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 85px !important;
+        height: 35px !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important;
+        text-decoration: none;
+        color: #ffffff;
+    }
+
+        .user a:hover {
             background-color: #F59E0B !important;
         }
 
@@ -364,17 +391,38 @@
         .user {
             padding: 30px;
         }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px !important;
+            }
     }
 
     @@media only screen and (max-width: 610px) {
         .user {
             padding: 10px;
         }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px !important;
+            }
     }
 
     @@media only screen and (max-height: 560px) {
         .user {
-            padding: 20px;
+            padding: 7px;
+            font-size: 10px !important;
+            gap: 2px;
         }
+
+        .signin {
+            font-size: 10px !important;
+        }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px !important;
+            }
     }
 </style>

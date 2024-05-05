@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿
+@{
+    var UserGlobal = ViewData["User"];
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,8 +26,8 @@
 
             <div class="breadcrumbs">
                 <p>
-                    <span><a href="/@ViewData["BreadcrumbsParent"]">@ViewData["TitleParent"]</a></span>                    
-                    <span>/</span> 
+                    <span><a href="/@ViewData["BreadcrumbsParent"]">@ViewData["TitleParent"]</a></span>
+                    <span>/</span>
                     <span><a href="/@ViewData["BreadcrumbsCurrent"]">@ViewData["TitleCurrent"]</a></span>
                 </p>
             </div>
@@ -30,28 +35,48 @@
 
         <div class="sidebar">
             <ul>
-                <li>
-                    <a href="">
-                        <i class='bx bx-power-off'></i>
-                        <span class="display">
-                            Đăng ký  <br>
-                            <span class="english"> Sign In</span>
-                        </span>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i class='bx bx-right-arrow'></i>
-                        <span class="display">
-                            Đăng nhập  <br>
-                            <span class="english"> Log In</span>
-                        </span>
-                    </a>
-                </li>
+                @if (UserGlobal == null)
+                {
+                    <li>
+                        <a href="/Signin_User?User=@UserGlobal">
+                            <i class='bx bx-power-off'></i>
+                            <span class="display">
+                                Đăng ký  <br>
+                                <span class="english"> Sign In</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Login_User?User=@UserGlobal">
+                            <i class='bx bx-log-in-circle'></i>
+                            <span class="display">
+                                Đăng nhập  <br>
+                                <span class="english"> Log In</span>
+                            </span>
+                        </a>
+                    </li>
+                } else
+                {
+                    <li>
+                        <p>
+                            <i class='bx bx-smile'></i>
+                             XIN CHÀO <span class="userInfo">@UserGlobal</span>  !
+                        </p>
+                    </li>
+                    <li>
+                        <a href="/Logout_User?User=@UserGlobal">
+                            <i class='bx bx-log-out-circle'></i>
+                            <span class="display">
+                                Đăng xuất  <br>
+                                <span class="english"> Log out</span>
+                            </span>
+                        </a>
+                    </li>
+                }         
             </ul>
             <ul>
                 <li>
-                    <a href="/Index">
+                    <a href="/List_Product?User=@UserGlobal">
                         <i class='bx bx-box'></i>
                         <span class="display">
                             Sản phẩm  <br>
@@ -60,7 +85,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/Error">
+                    <a href="/Error?User=@UserGlobal">
                         <i class='bx bx-category-alt'></i>
                         <span class="display">
                             Loại sản phẩm  <br>
@@ -80,7 +105,7 @@
                 <li>
                     <a href="">
                         <i class='bx bx-archive-in'></i>
-                        <span class ="display">
+                        <span class="display">
                             Hóa đơn nhập hàng  <br>
                             <span class="english"> Inputs Invoice</span>
                         </span>

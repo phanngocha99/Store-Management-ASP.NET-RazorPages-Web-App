@@ -1,0 +1,205 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@model StoreManagement.Pages.Logout_UserModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+
+@{
+    string confirm;
+    if (validUser)
+    {
+        if (Request.Method == "POST")
+        {
+            confirm = Request.Form["logoutUser"];
+            if (confirm == "Đúng")
+            {
+                userGlobal = null;
+            }
+        }
+    }
+    ViewData["User"] = userGlobal;
+}
+
+@{
+    ViewData["TitleParent"] = "Người dùng";
+    ViewData["BreadcrumbsParent"] = "Signin_User?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Đăng xuất";
+    ViewData["BreadcrumbsCurrent"] = "Logout_User?User=" + userGlobal;
+}
+
+<div class="content">
+    <div class="top">
+        <div class="title">Đăng xuất</div>
+    </div>
+
+    
+
+    @if (userGlobal == null)
+    {
+        <div class="logoutUser_User_notification">
+            <div class="logoutUser_User_notification_note">
+                <i class='bx bx-info-circle'></i><p>Đã đăng xuất thành công</p>
+            </div>
+            <a href="/Login_User?User=@userGlobal">OK</a>
+        </div>
+    } else
+    {
+        <div class="logoutUser_notification">
+            <div class="logoutUser_notification_note">
+                <i class='bx bx-info-circle'></i><p>Bạn chắn chắn muốn đăng xuất?</p>
+            </div>
+            <div class="confirm_logoutUser">
+                <form method="POST">
+                    <input type="submit" id="logoutUser" name="logoutUser" value="Đúng"><br>
+                </form>
+                <a href="/List_Product?User=@userGlobal">Không</a>
+            </div>
+        </div>
+    }
+
+
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #D97706 !important;
+        }
+
+    .logoutUser_notification {
+        background: #1F2937;
+        padding: 5px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 5px;
+        width: 60vw;
+    }
+
+    .logoutUser_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .logoutUser_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+            
+    .confirm_logoutUser {
+        display: flex;
+        gap: 20px;
+    }
+
+        .confirm_logoutUser #logoutUser {
+            width: 75px;
+            height: 30px;
+            border-radius: 5px;
+            background-color: #D97706;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+
+        .confirm_logoutUser a {
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background-color: #D97706;
+            color: #000000;
+            font-weight: bold;
+        }
+
+    .logoutUser_User_notification {
+        background: #1F2937;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #00ff00;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60vw;
+        margin-top: 5px;
+    }
+
+
+    .logoutUser_User_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .logoutUser_User_notification_note .bx-info-circle {
+            color: #00ff00;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .logoutUser_User_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #00ff00;
+        color: #000000;
+        font-weight: bold;
+    }
+</style>
+
+

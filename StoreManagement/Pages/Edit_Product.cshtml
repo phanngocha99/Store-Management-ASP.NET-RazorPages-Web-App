@@ -1,8 +1,22 @@
 ﻿@page
 @using StoreManagement.Entities;
+@using StoreManagement.Data;
 @using StoreManagement.Logic;
 @using System.Web;
 @model StoreManagement.Pages.Edit_ProductModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
 
 @{
     Product editProduct;
@@ -68,13 +82,34 @@
                     validProductResult = false;
                 }
 
-                if (Product_Logic.IsNotUnitProductId(int.Parse(productId)))
+                if (currentProductId != int.Parse(productId))
                 {
-                    messageValidProduct = "Mã sản phẩm đã tồn tại!";
+                    if (Product_Logic.IsNotUniqueProductId(int.Parse(productId)))
+                    {
+                        messageValidProduct = "Mã sản phẩm đã tồn tại!";
+                        validProductResult = false;
+                    }
+                }
+                
+            }
+
+            if (validProductResult)
+            {
+                if (Product_Logic.IsNotContainBlankSpaceProductId(productId))
+                {
+                    messageValidProduct = "Mã sản phẩm phải là số dương";
                     validProductResult = false;
                 }
             }
 
+            if (validProductResult)
+            {
+                if (Product_Logic.IsNotValidDateManufactureandExpire(productManufactureDate, productExpireDate))
+                {
+                    messageValidProduct = "Ngày hết hạn phải sau ngày sản xuất";
+                    validProductResult = false;
+                }
+            }
 
             if (validProductResult)
             {
@@ -95,9 +130,9 @@
 
 @{
     ViewData["TitleParent"] = "Sản phẩm";
-    ViewData["BreadcrumbsParent"] = "Index";
+    ViewData["BreadcrumbsParent"] = "List_Product?User=" + userGlobal;
     ViewData["TitleCurrent"] = "Sửa sản phẩm";
-    ViewData["BreadcrumbsCurrent"] = "Edit_Product?productId=" + productId;
+    ViewData["BreadcrumbsCurrent"] = "Edit_Product?productId=" + productId + "&User=" + userGlobal;
 }
 
 <div class="content">
@@ -143,7 +178,7 @@
                 <div class="edit_product_notification_note">
                     <i class='bx bx-info-circle'></i><p>Đã sửa sản phẩm thành công</p>
                 </div>
-                <a href="/Index">OK</a>
+                <a href="/List_Product?User=@userGlobal">OK</a>
             </div>
         }
         @if (!validProductResult)
@@ -274,7 +309,7 @@
     .valid_product_notification {
         background: #1F2937;
         position: absolute;
-        top: 12vh;
+        top: 15px;
         left: 50%;
         padding: 10px;
         border-radius: 5px;
@@ -317,24 +352,22 @@
     }
 
     }
+    
     /*Responsive*/
     @@media (min-width:610px) and (max-width: 1140px) {
-        .edit_product_notification {
-            top: 12vh;
+        .valid_product_notification {
             left: 30%;
         }
     }
 
     @@media only screen and (max-width: 610px) {
-        .edit_product_notification {
-            top: 12vh;
+        .valid_product_notification {
             left: 30%;
         }
     }
 
     @@media only screen and (max-height: 560px) {
-        .edit_product_notification {
-            top: 20%;
+        .valid_product_notification {
             left: 30%;
         }
     }

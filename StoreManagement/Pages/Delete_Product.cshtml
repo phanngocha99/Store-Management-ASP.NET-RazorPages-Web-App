@@ -3,6 +3,20 @@
 @using StoreManagement.Logic;
 @using System.Web;
 @model StoreManagement.Pages.Delete_ProductModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
 @{
     Product deleteProduct;
     int productId = int.Parse(Request.Query["productId"]);
@@ -33,9 +47,9 @@
 
 @{
     ViewData["TitleParent"] = "Sản phẩm";
-    ViewData["BreadcrumbsParent"] = "Index";
+    ViewData["BreadcrumbsParent"] = "List_Product?User=" + userGlobal;
     ViewData["TitleCurrent"] = "Xóa sản phẩm";
-    ViewData["BreadcrumbsCurrent"] = "Delete_Product?productId=" + productId;
+    ViewData["BreadcrumbsCurrent"] = "Delete_Product?productId=" + productId + "&User=" + userGlobal;
 }
 
 <div class="content">
@@ -63,7 +77,7 @@
                     <form method="POST">
                         <input type="submit" id="deleteProduct" name="deleteProduct" value="Đúng"><br>
                     </form>
-                    <a href="/Index">Không</a>
+                    <a href="/List_Product?User=@userGlobal">Không</a>
                 </div>
             </div>
             <div class="product">
@@ -91,7 +105,7 @@
                 <div class="delete_success_product_notification_note">
                     <i class='bx bx-info-circle'></i><p>Đã xóa sản phẩm thành công</p>
                 </div>
-                <a href="/Index">OK</a>
+                <a href="/List_Product?User=@userGlobal">OK</a>
             </div>
         }
     }
@@ -305,10 +319,24 @@
         color: #D97706;
     }
 
-
     /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .valid_product_notification {
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .valid_product_notification {
+            left: 30%;
+        }
+    }
 
     @@media only screen and (max-height: 560px) {
+        .valid_product_notification {
+            left: 30%;
+        }
+
         .product {
             height: 40vh;
         }

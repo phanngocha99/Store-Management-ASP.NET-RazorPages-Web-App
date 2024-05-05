@@ -1,5 +1,7 @@
-﻿using StoreManagement.Data;
+﻿using Microsoft.AspNetCore.Http;
+using StoreManagement.Data;
 using StoreManagement.Entities;
+using System;
 
 namespace StoreManagement.Logic
 {
@@ -252,6 +254,11 @@ namespace StoreManagement.Logic
             return result;
         }
 
+        public static bool IsNotContainBlankSpaceProductId(string productId)
+        {
+            return productId.Contains(" ");
+        }
+
         public static Product? EditProduct(int productId, Product newEditProduct)
         {
             Product[] listProducts = Product_Data.ReadListProduct();
@@ -311,7 +318,7 @@ namespace StoreManagement.Logic
         }
 
 
-        public static bool IsNotUnitProductId(int productId)
+        public static bool IsNotUniqueProductId(int productId)
         {
             Product[] listProducts = Product_Data.ReadListProduct();
 
@@ -343,5 +350,20 @@ namespace StoreManagement.Logic
             }
             return false;
         }
+
+        public static bool IsNotValidDateManufactureandExpire(string startDateStr, string endDateStr)
+        {
+            DateTime startDate = DateTime.Parse(startDateStr);
+            DateTime endDate = DateTime.Parse(endDateStr);
+
+            TimeSpan ts = endDate - startDate;
+
+            if(ts.TotalDays < 0)
+            {
+                return true;
+            }
+            
+            return false;
+        }  
     }
 }

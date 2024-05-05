@@ -2,21 +2,20 @@
 @using StoreManagement.Entities;
 @using StoreManagement.Logic;
 @using System.Web;
-@model StoreManagement.Pages.IndexModel
+@model StoreManagement.Pages.Login_UserModel
 
 @{
     string userGlobal = Request.Query["User"];
     bool validUser;
 
-    if (!string.IsNullOrEmpty(userGlobal))
+    if(!string.IsNullOrEmpty(userGlobal))
     {
         validUser = User_Logic.FindUserByUserName(userGlobal);
         if (!validUser)
         {
             string errorMessage = "noUser";
             Response.Redirect("/Error?error=" + errorMessage);
-        }
-        else
+        } else
         {
             Response.Redirect("/List_Product?User=" + userGlobal);
         }
@@ -25,7 +24,7 @@
 
 @{
     User newUser;
-    bool addUserResult = false;
+    bool LoginUserResult = false;
     bool validUserResult = true;
     string messageValidUser = "";
     string userName = "";
@@ -38,63 +37,6 @@
         userName = Request.Form["userName"];
         password = Request.Form["password"];
         userInfo = new string[] { userName, password };
-
-
-        for (int i = userInfo.Length - 1; i > -1; i--)
-        {
-            if (User_Logic.IsNotValidString(userInfo[i]))
-            {
-                messageValidUser = $"{userLabel[i]} chưa được điền!";
-                validUserResult = false;
-            }
-        }
-
-        if (validUserResult)
-        {
-
-            if (User_Logic.IsNotValidUserNameLength(userName))
-            {
-                messageValidUser = "Tên đăng nhập phải trên 3 ký tự!";
-                validUserResult = false;
-            }
-            if (User_Logic.IsNotValidPasswordLength(password))
-            {
-                messageValidUser = "Mật khẩu phải trên 5 ký tự!";
-                validUserResult = false;
-            }
-        }
-
-        if (validUserResult)
-        {
-
-            if (User_Logic.IsNotValidContainLetterUserName(userName))
-            {
-                messageValidUser = "Tên đăng nhập phải chứa chữ cái!";
-                validUserResult = false;
-            }
-            if (User_Logic.IsNotValidContainLetterPassword(password))
-            {
-                messageValidUser = "Mật khẩu phải chứa chữ cái!";
-                validUserResult = false;
-            }
-        }
-
-        if (validUserResult)
-        {
-
-            if (User_Logic.IsNotValidContainNumberPassword(password))
-            {
-                messageValidUser = "Mật khẩu phải chứa chữ số!";
-                validUserResult = false;
-            }
-
-            if (User_Logic.IsNotValidContainSpecialLetterPassword(password))
-            {
-                messageValidUser = "Mật khẩu phải chứa ký tự đặc biệt!";
-                validUserResult = false;
-            }
-
-        }
 
         if (validUserResult)
         {
@@ -115,40 +57,39 @@
 
         if (validUserResult)
         {
-
-            if (User_Logic.IsNotUniqueUserName(userName))
-            {
-                messageValidUser = "Tên đăng nhập đã tồn tại!";
-                validUserResult = false;
-            }
-        }
-
-        if (validUserResult)
-        {
             newUser.UserName = userName.Trim();
             newUser.Password = password.Trim();
-            addUserResult = User_Logic.AddUser(newUser);
-            ViewData["User"] = userName.Trim();
-        }
+            LoginUserResult = User_Logic.FindUser(newUser);
+            if (!LoginUserResult)
+            {
+                messageValidUser = $"Tên đăng nhập hoặc mật khẩu không đúng!";
+                validUserResult = false;
+            }else
+            {
+                ViewData["User"] = newUser.UserName;
+                userGlobal = newUser.UserName;
+            }
+        } 
     }
 }
+
 @{
     ViewData["TitleParent"] = "Người dùng";
-    ViewData["BreadcrumbsParent"] = "Signin_User/User=" + userName.Trim();
-    ViewData["TitleCurrent"] = "Đăng ký";
-    ViewData["BreadcrumbsCurrent"] = "Signin_User/User=" + userName.Trim();
+    ViewData["BreadcrumbsParent"] = "Signin_User?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Đăng nhập";
+    ViewData["BreadcrumbsCurrent"] = "Login_User?User=" + userGlobal;
 }
 
 <div class="content">
-    @if (addUserResult)
+    @if (LoginUserResult)
     {
         <div class="new_user_notification">
             <div class="new_user_notification_note">
-                <i class='bx bx-info-circle'></i><p>Đã đăng ký thành công!</p>
+                <i class='bx bx-info-circle'></i><p>Đã đăng nhập thành công!</p>
             </div>
-            <a href="/List_Product?User=@userName.Trim()">OK</a>
+            <a href="/List_Product?User=@userGlobal">OK</a>
         </div>
-    }
+    } 
     else
     {
         @if (!validUserResult)
@@ -164,24 +105,18 @@
             <div class="name_store">
                 PHẦN MỀM QUẢN LÝ CỬA HÀNG
             </div>
-            <div class="signin">
-                ĐĂNG KÝ
+            <div class="login">
+                ĐĂNG NHẬP
             </div>
             <form method="POST">
                 <label for="userName">Tên đăng nhập: </label><br>
-                <p>
-                    (Tên đăng nhập phải chứa ít nhất 3 ký tự <br>
-                    và phải chứa chữ cái)
-                </p>
                 <input type="text" id="userName" name="userName" value="@userName"><br>
                 <label for="password">Mật khẩu: </label><br>
-                <p>
-                    (Mật khẩu phải chứa ít nhất 5 ký tự <br>
-                    và phải chứa chữ cái, số và ký tự đặc biệt)
-                </p>
                 <input type="password" id="password" name="password" value="@password"><br>
-                <input class="submitBtn" type="submit" value="ĐĂNG KÝ">
+                <input class="submitBtn" type="submit" value="ĐĂNG NHẬP">
             </form>
+            <div> Chưa có tài khoản?</div>
+            <a href="/Signin_User?User=@userGlobal">ĐĂNG KÝ</a>
         </div>
     }
 </div>
@@ -213,16 +148,10 @@
         font-weight: bold;
     }
 
-    .signin {
+    .login {
         font-size: 18px;
         font-weight: bold;
         color: #D97706;
-    }
-
-    .user form p {
-        font-size: 10px;
-        font-style: italic;
-        margin-top: 0px;
     }
 
     .user label {
@@ -252,7 +181,7 @@
         margin-right: 10px;
         cursor: pointer;
         width: 100px !important;
-        height: auto !important;
+        height: 50px !important;
         font-weight: bold;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -260,6 +189,29 @@
     }
 
         .submitBtn:hover {
+            background-color: #F59E0B !important;
+        }
+
+    .user a{
+        background-color: #D97706 !important;
+        padding: 5px !important;
+        border-radius: 5px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 85px !important;
+        height: 35px !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important;
+        text-decoration: none;
+        color: #ffffff;
+    }
+
+        .user a:hover {
             background-color: #F59E0B !important;
         }
 
@@ -356,7 +308,8 @@
         }
 
         .submitBtn {
-            padding: 10px !important;
+            font-size: 14px !important;
+            padding: 12px !important;
         }
     }
 
@@ -364,17 +317,34 @@
         .user {
             padding: 30px;
         }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px !important;
+            }
     }
 
     @@media only screen and (max-width: 610px) {
         .user {
             padding: 10px;
         }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px!important;
+            }
     }
 
     @@media only screen and (max-height: 560px) {
         .user {
             padding: 20px;
         }
+
+            .user a, .submitBtn {
+                height: auto !important;
+                margin-top: 0px !important;
+            }
     }
 </style>
+
+

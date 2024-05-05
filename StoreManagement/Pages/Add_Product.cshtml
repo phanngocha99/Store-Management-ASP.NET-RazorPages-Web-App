@@ -1,13 +1,28 @@
 ﻿@page
 @using StoreManagement.Entities;
+@using StoreManagement.Data;
 @using StoreManagement.Logic;
 @using System.Web;
 @model StoreManagement.Pages.Add_ProductModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
 @{
     ViewData["TitleParent"] = "Sản phẩm";
-    ViewData["BreadcrumbsParent"] = "Index";
+    ViewData["BreadcrumbsParent"] = "List_Product?User=" + userGlobal;
     ViewData["TitleCurrent"] = "Thêm sản phẩm";
-    ViewData["BreadcrumbsCurrent"] = "Add_Product";
+    ViewData["BreadcrumbsCurrent"] = "Add_Product?User=" + userGlobal;
 }
 
 @{
@@ -61,9 +76,27 @@
                 validProductResult = false;
             }
 
-            if (Product_Logic.IsNotUnitProductId(int.Parse(productId)))
+            if (Product_Logic.IsNotUniqueProductId(int.Parse(productId)))
             {
                 messageValidProduct = "Mã sản phẩm đã tồn tại!";
+                validProductResult = false;
+            }
+        }
+
+        if (validProductResult)
+        {
+            if (Product_Logic.IsNotContainBlankSpaceProductId(productId))
+            {
+                messageValidProduct = "Mã sản phẩm phải là số dương";
+                validProductResult = false;
+            }
+        }
+
+        if (validProductResult)
+        {
+            if (Product_Logic.IsNotValidDateManufactureandExpire(productManufactureDate, productExpireDate))
+            {
+                messageValidProduct = "Ngày hết hạn phải sau ngày sản xuất";
                 validProductResult = false;
             }
         }
@@ -71,7 +104,7 @@
 
         if (validProductResult)
         {
-            newProduct.Id = int.Parse(productId);
+            newProduct.Id = int.Parse(productId.Trim());
             newProduct.Name = productName;
             newProduct.ExpiredDate = productExpireDate;
             newProduct.Company = productCompany;
@@ -87,44 +120,44 @@
     <div class="top">
         <div class="title">THÊM SẢN PHẨM</div>
     </div>
-    <div class="product">
-        <form method="POST">
-            <label for="productId">Mã sản phẩm: </label><span class="validInput">(Mã sản phẩm chỉ có thể là số)</span><br>
-            <input type="number" id="productId" name="productId" value="@productInfo[0]"><br>
-            <label for="productName">Tên sản phẩm: </label><br>
-            <input type="text" id="productName" name="productName" value="@productInfo[1]"><br>
-            <label for="productExpireDate">Ngày hết hạn: </label><br>
-            <input type="date" id="productExpireDate" name="productExpireDate" value="@productInfo[2]"><br>
-            <label for="productCompany">Công ty: </label><br>
-            <input type="text" id="productCompany" name="productCompany" value="@productInfo[3]"><br>
-            <label for="productManufactureDate">Ngày sản xuất: </label><br>
-            <input type="date" id="productManufactureDate" name="productManufactureDate" value="@productInfo[4]"><br>
-            <label for="productCategory">Loại hàng: </label><br>
-            <input type="text" id="productCategory" name="productCategory" value="@productInfo[5]"><br>
-            <label for="productPrice">Giá: </label><span class="validInput">(Giá sản phẩm chỉ có thể là số)</span><br>
-            <input type="number" id="productPrice" name="productPrice" value="@productInfo[6]"><br>
-            <input class="submitBtn" type="submit" value="THÊM SẢN PHẨM">
-        </form>
-    </div>
-
     @if (addProductResult)
     {
         <div class="new_product_notification">
             <div class="new_product_notification_note">
                 <i class='bx bx-info-circle'></i><p>Đã thêm sản phẩm thành công</p>
             </div>
-            <a href="/Index">OK</a>
+            <a href="/List_Product?User=@userGlobal">OK</a>
         </div>
-    }
-    @if (!validProductResult)
+    } else
     {
-        <div class="valid_product_notification">
-            <div class="valid_product_notification_note">
-                <i class='bx bx-info-circle'></i><p class="validProduct">@messageValidProduct</p>
+        @if (!validProductResult)
+        {
+            <div class="valid_product_notification">
+                <div class="valid_product_notification_note">
+                    <i class='bx bx-info-circle'></i><p class="validProduct">@messageValidProduct</p>
+                </div>
             </div>
+        }
+        <div class="product">
+            <form method="POST">
+                <label for="productId">Mã sản phẩm: </label><span class="validInput">(Mã sản phẩm chỉ có thể là số)</span><br>
+                <input type="number" id="productId" name="productId" value="@productInfo[0]"><br>
+                <label for="productName">Tên sản phẩm: </label><br>
+                <input type="text" id="productName" name="productName" value="@productInfo[1]"><br>
+                <label for="productExpireDate">Ngày hết hạn: </label><br>
+                <input type="date" id="productExpireDate" name="productExpireDate" value="@productInfo[2]"><br>
+                <label for="productCompany">Công ty: </label><br>
+                <input type="text" id="productCompany" name="productCompany" value="@productInfo[3]"><br>
+                <label for="productManufactureDate">Ngày sản xuất: </label><br>
+                <input type="date" id="productManufactureDate" name="productManufactureDate" value="@productInfo[4]"><br>
+                <label for="productCategory">Loại hàng: </label><br>
+                <input type="text" id="productCategory" name="productCategory" value="@productInfo[5]"><br>
+                <label for="productPrice">Giá: </label><span class="validInput">(Giá sản phẩm chỉ có thể là số)</span><br>
+                <input type="number" id="productPrice" name="productPrice" value="@productInfo[6]"><br>
+                <input class="submitBtn" type="submit" value="THÊM SẢN PHẨM">
+            </form>
         </div>
     }
-
 </div>
 <style>
 
@@ -217,9 +250,6 @@
 
     .new_product_notification {
         background: #1F2937;
-        position: absolute;
-        top: 12vh;
-        left: 50%;
         padding: 10px;
         border-radius: 5px;
         border: 2px solid #00ff00;
@@ -227,6 +257,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 60vw;
+        margin-top: 5px;
     }
 
     .new_product_notification_note {
@@ -254,7 +286,7 @@
     .valid_product_notification {
         background: #1F2937;
         position: absolute;
-        top: 12vh;
+        top: 15px;
         left: 50%;
         padding: 10px;
         border-radius: 5px;
@@ -288,22 +320,19 @@
 
     /*Responsive*/
     @@media (min-width:610px) and (max-width: 1140px) {
-        .new_product_notification {
-            top: 12vh;
+        .valid_product_notification {
             left: 30%;
         }
     }
 
     @@media only screen and (max-width: 610px) {
-        .new_product_notification {
-            top: 12vh;
+        .valid_product_notification {
             left: 30%;
         }
     }
 
     @@media only screen and (max-height: 560px) {
-        .new_product_notification {
-            top: 20%;
+        .valid_product_notification {
             left: 30%;
         }
     }
