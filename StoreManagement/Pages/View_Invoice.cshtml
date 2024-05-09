@@ -1,0 +1,204 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.View_InvoiceModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+@{
+    bool validResult = true;
+    string messageValid = "";
+    int invoiceId = int.Parse(Request.Query["invoiceId"]);
+    Invoice invoice = Invoice_Logic.FindInvoiceById(invoiceId);
+    Product[] listProducts = Product_Data.ReadListProduct();
+    int[] sumItemPrice = new int[invoice.Items.Length];
+    int sumInvoicePrice = 0;
+    int sumInvoiceQuantity = 0;
+    @for (int i = 0; i < invoice.Items.Length; i++)
+    {
+        sumItemPrice[i] = invoice.Items[i].Product.Price * invoice.Items[i].Quantity;
+        sumInvoicePrice = sumInvoicePrice + sumItemPrice[i]; 
+        sumInvoiceQuantity = sumInvoiceQuantity + invoice.Items[i].Quantity;
+    }
+
+}
+
+@{
+    ViewData["TitleParent"] = "Hóa đơn nhập hàng";
+    ViewData["BreadcrumbsParent"] = "List_InputsInvoice?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Xem hóa đơn nhập hàng";
+    ViewData["BreadcrumbsCurrent"] = "View_Invoice?&invoiceId=" + invoice.Id + "&User=" + userGlobal;
+}
+
+@if (!validResult)
+{
+    <div class="valid_notification">
+        <div class="valid_notification_note">
+            <i class='bx bx-info-circle'></i><p class="valid">@messageValid</p>
+        </div>
+    </div>
+}
+<div class="content">
+    <div class="top">
+        <div class="title">THÊM HÓA ĐƠN NHẬP HÀNG</div>
+    </div>
+    <div class="wrap">
+        <div class="wrap_title">HÓA ĐƠN NHẬP HÀNG</div>
+        <div class="InvoiceInfo">
+            <p>Mã hóa đơn: <span>@invoice.Id</span></p>
+            <p>Ngày nhập hàng: <span>@invoice.Date</span></p>
+        </div>
+        <div class="add">
+            <form method="POST">
+                <table border="1">
+                    <tr class="hightlight">
+                        <th>Số thứ tự</th>
+                        <th>Mã sản phẩm</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Đơn giá</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                    @for (int i = 0; i < invoice.Items.Length; i++)
+                    {
+                        <tr>
+                            <td>
+                                <p>@(i + 1)</p>
+                            </td>
+                            <td>
+                                <p>@invoice.Items[i].Product.Id</p>
+                            </td>
+                            <td>
+                                <p>@invoice.Items[i].Product.Name</p>
+                            </td>                     
+                            <td>
+                                <p>@invoice.Items[i].Product.Price</p>
+                            </td>
+                            <td>
+                                <p>@invoice.Items[i].Quantity</p>
+                            </td>
+                            <td>
+                                <p>@sumItemPrice[i]</p>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="hightlight">
+                        <td colspan="4">TỔNG</td>
+                        <td>@sumInvoiceQuantity</td>
+                        <td>@sumInvoicePrice</td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .wrap {
+        background-color: #1F2937;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+        .wrap .wrap_title {
+            padding-top: 15px;
+            color: #D97706;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+    .InvoiceInfo {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        background-color: #1F2937;
+        margin: 5px;
+        border-radius: 20px;
+        font-size: 14px;
+        overflow: auto;
+        width: 60vw;
+        margin-top: 10px;
+    }
+
+        .InvoiceInfo p {
+            margin: 5px;
+            font-weight: bold;
+        }
+
+            .InvoiceInfo p span {
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                padding: 5px 10px 0px 10px;
+                background-color: #9CA3AF50;
+                border: 1px solid #374151;
+                border-radius: 5px;
+                margin: 5px 5px 10px 0px;
+                font-weight: normal;
+            }
+
+    .add {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        border-radius: 20px;
+        font-size: 14px;
+        width: 60vw;
+        height: 60vh;
+        overflow: auto;
+    }
+
+    td, th {
+        padding: 3px;
+        text-align: center;
+    }
+
+    .hightlight {
+        background-color: #9CA3AF50;
+        font-weight:bold;
+    }
+
+    /*Responsive*/
+
+    @@media only screen and (max-height: 560px) {
+        .add {
+            height: 45vh;
+        }
+    }
+
+</style>
+
+

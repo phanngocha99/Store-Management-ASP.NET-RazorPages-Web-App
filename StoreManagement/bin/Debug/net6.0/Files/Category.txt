@@ -1,2 +1,2 @@
-1,Điện thoại,4
+1,Điện thoại,3
 2,Laptop,1

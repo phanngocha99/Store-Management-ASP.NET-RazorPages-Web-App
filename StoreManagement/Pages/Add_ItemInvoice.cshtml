@@ -1,0 +1,423 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.Add_Item_InvoiceModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+@{
+    ViewData["TitleParent"] = "Hóa đơn nhập hàng";
+    ViewData["BreadcrumbsParent"] = "List_InputsInvoice?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Thêm hóa đơn nhập hàng";
+    ViewData["BreadcrumbsCurrent"] = "Add_InputsInvoice?User=" + userGlobal;
+}
+
+@{
+    bool addResult = false;
+    bool validResult = true;
+    string messageValid = "";
+    int numberOfItems = int.Parse(Request.Query["numberOfItem"]);
+    int invoiceId = int.Parse(Request.Query["invoiceId"]);
+    string invoiceDate = Request.Query["invoiceDate"];
+    int[] itemQuantity = new int[numberOfItems];
+    string[] itemQuantityStr = new string[numberOfItems];
+    int[] productId = new int[numberOfItems];
+    string[] productIdStr = new string[numberOfItems];
+
+    Product[] listProducts = Product_Data.ReadListProduct();
+    Item[] listItem = new Item[numberOfItems];
+    Invoice invoice = new Invoice();
+    invoice.Id = invoiceId;
+    invoice.Date = invoiceDate;
+
+    if (Request.Method == "POST")
+    {
+
+        for (int j = numberOfItems -1; j > -1 ; j--)
+        {
+            itemQuantityStr[j] = Request.Form["itemQuantity(" + j + ")"];
+            productIdStr[j] = Request.Form["productId(" + j + ")"];
+
+            listItem[j].InvoiceId = invoiceId;
+            if (Invoice_Logic.IsNotValidString(itemQuantityStr[j]) )
+            {
+                messageValid = $"Số lượng của sản phẩm thứ {j+1} chưa được điền!";
+                validResult = false;
+            }
+            else if (productIdStr[j] == "None")
+            {
+                messageValid = $"Sản phẩm dòng thứ {j + 1} chưa được điền!";
+                validResult = false;
+            } else
+            {
+                itemQuantity[j] = int.Parse(Request.Form["itemQuantity(" + j + ")"]);
+                listItem[j].Quantity = int.Parse(itemQuantityStr[j]);
+                productId[j] = int.Parse(productIdStr[j]);
+                listItem[j].Product = Product_Logic.FindProductById(productId[j]);
+            }
+        }
+
+        if (validResult)
+        {
+            for (int j = numberOfItems - 1; j > -1; j--)
+            {
+                int first_index = Array.IndexOf(productId, productId[j]);
+                int last_index = Array.LastIndexOf(productId, productId[j]);
+
+                int occur_time = last_index - first_index + 1; 
+
+                if (occur_time > 1)
+                {
+                    messageValid = $"Sản phẩm ở từng dòng không được trùng nhau!";
+                    validResult = false;
+                }
+            }
+        }
+
+        if (validResult)
+        {
+            invoice.Items = listItem;
+            addResult = Invoice_Logic.AddItemsByInvoiceId(listItem);
+            addResult = Invoice_Logic.AddInvoices(invoice);
+        }
+    }
+
+}
+
+<div class="content">
+    @if (addResult)
+    {
+        <div class="new_notification">
+            <div class="new_notification_note">
+                <i class='bx bx-info-circle'></i><p>Đã thêm hóa đơn nhập thành công</p>
+            </div>
+            <a href="/List_InputsInvoice?User=@userGlobal">OK</a>
+        </div>
+    } else
+    {
+        @if (!validResult)
+        {
+            <div class="valid_notification">
+                <div class="valid_notification_note">
+                    <i class='bx bx-info-circle'></i><p class="valid">@messageValid</p>
+                </div>
+            </div>
+        }
+        <div class="top">
+            <div class="title">THÊM HÓA ĐƠN NHẬP HÀNG</div>
+        </div>
+        <div class="wrap">
+            <div class="wrap_title">HÓA ĐƠN NHẬP HÀNG</div>
+            <div class="InvoiceInfo">
+                <p>Mã hóa đơn: <span>@invoiceId</span></p>
+                <p>Ngày nhập hàng: <span>@invoiceDate</span></p>
+            </div>
+            <div class="add">
+                <form method="POST">
+                    <table border="1">
+                        <tr>
+                            <th>Số thứ tự</th>
+                            <th>Mã sản phẩm</th>
+                            <th>Số lượng</th>
+                        </tr>
+                        @for (int i = 0; i < numberOfItems; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="number" id="itemNumber" name="itemNumber" value="@(i+1)" readonly><br>
+                                </td>
+                                <td>
+                                    <select name="productId(@i)" id="productId(@i)">
+                                        <option value="None"> --None-- </option>
+                                        @for (int productNumber = 0; productNumber < listProducts.Length; productNumber++)
+                                        {
+                                            if (listProducts[productNumber].Id == productId[i])
+                                            {
+                                                <option value="@listProducts[productNumber].Id" selected> @listProducts[productNumber].Id </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@listProducts[productNumber].Id"> @listProducts[productNumber].Id </option>
+                                            }
+                                        }
+                                    </select><br>
+                                </td>
+                                <td>
+                                    <input type="number" id="itemQuantity(@i)" name="itemQuantity(@i)" value="@itemQuantity[i]"><br>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                    <input class="submitBtn" type="submit" value="THÊM HÓA ĐƠN">
+
+                </form>
+            </div>
+        </div>
+    }  
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .wrap{
+        background-color: #1F2937;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items:center;
+        margin-top:10px;
+    }
+
+        .wrap .wrap_title {
+            padding-top: 15px;
+            color: #D97706;
+            font-weight: bold;
+            font-size:18px;
+        }
+
+    .InvoiceInfo {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        background-color: #1F2937;
+        margin: 5px;
+        border-radius: 20px;
+        font-size: 14px;
+        overflow: auto;
+        width: 60vw;
+        margin-top: 10px;
+    }
+
+    .InvoiceInfo p{
+        margin: 5px;
+        font-weight: bold;
+    }
+
+        .InvoiceInfo p span{
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                padding: 5px 10px 0px 10px;
+                background-color: #9CA3AF50;
+                border: 1px solid #374151;
+                border-radius: 5px;
+                margin: 5px 5px 10px 0px;
+                font-weight: normal;
+            }
+
+    .add {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        border-radius: 20px;
+        font-size: 14px;
+        width: 60vw;
+        height: 60vh;
+        overflow: auto;
+    }
+    td,th{
+        padding:3px;
+    }
+        .add form {
+            width: 50vw;
+            height: 58vh;
+            overflow: auto;
+            display:flex;
+            justify-content: space-around;
+            flex-direction:column;
+            align-items: center
+        }
+
+        .add label {
+            margin-top: 20px;
+            font-weight: bold;
+            width: 45vw;
+        }
+
+        .add .validInput {
+            font-style: italic;
+            color: #ffffff;
+        }
+
+    .valid {
+        font-style: italic;
+        color: #D97706;
+    }
+
+    .add input {
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        padding-left: 10px;
+        height: 30px;
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 5px;
+        margin: 5px 5px 10px 0px;
+        text-align: center;
+    }
+
+    .add select {
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 10px;
+        color: #ffffff;
+        height: 30px;
+        margin: 5px;
+        margin-bottom: 10px;
+    }
+
+        .add select option {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+        }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #D97706 !important;
+        }
+
+    .new_notification {
+        background: #1F2937;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #00ff00;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60vw;
+        margin-top: 5px;
+    }
+
+    .new_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .new_notification_note .bx-info-circle {
+            color: #00ff00;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .new_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #00ff00;
+        color: #000000;
+        font-weight: bold;
+    }
+
+
+    .valid_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .valid_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .valid_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .valid_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .valid_notification {
+            left: 30%;
+        }
+
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .valid_notification {
+            left: 30%;
+        }
+
+       
+    }
+
+    @@media only screen and (max-height: 560px) {
+        .valid_notification {
+            left: 30%;
+        }
+
+        .add {
+            height: 45vh;
+        }
+    }
+
+</style>
+
+

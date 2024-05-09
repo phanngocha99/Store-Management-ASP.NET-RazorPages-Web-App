@@ -1,0 +1,275 @@
+﻿@page
+@using StoreManagement.Entities;
+@using StoreManagement.Data;
+@using StoreManagement.Logic;
+@using System.Web;
+@model StoreManagement.Pages.Edit_SalesInvoiceModel
+
+@{
+    string userGlobal = Request.Query["User"];
+    ViewData["User"] = userGlobal;
+
+    bool validUser = User_Logic.FindUserByUserName(userGlobal);
+}
+
+@if (!validUser)
+{
+    string errorMessage = "noUser";
+    Response.Redirect("/Error?error=" + errorMessage);
+}
+
+@{
+    bool validResult = true;
+    string messageValid = "";
+    int currentInvoiceId = int.Parse(Request.Query["invoiceId"]);
+    string invoiceId = "";
+    Invoice currentInvoice = Invoice_Logic.FindInvoiceByIdSales(currentInvoiceId);
+    Product[]? listProductsTemp;
+    listProductsTemp = Product_Logic.FindInventoryProduct();
+    int[] quantityProductTemp = Product_Logic.FindInventoryProductQuantity();
+    int n = 0;
+    for (int i = 0; i < listProductsTemp.Length; i++)
+    {
+        if (quantityProductTemp[i] > 0)
+        {
+            n++;
+        }
+    }
+
+    Product[] listProducts = new Product[n];
+    int[] quantityProduct = new int[n];
+    int k = 0;
+    for (int i = 0; i < listProductsTemp.Length; i++)
+    {
+        if (quantityProductTemp[i] > 0)
+        {
+            listProducts[k] = listProductsTemp[i];
+            quantityProduct[k] = quantityProductTemp[i];
+            k++;
+        }
+    }
+    string numberOfItem = currentInvoice.Items.Length.ToString();
+    string invoiceDate = currentInvoice.Date;
+    string[] invoiceInfo = new string[] { currentInvoiceId.ToString(), invoiceDate, numberOfItem };
+    string[] invoiceLabel = new string[] { "Mã hóa đơn", "Ngày nhập hàng", "Số lượng sản phẩm" };
+
+    if (Request.Method == "POST")
+    {
+        numberOfItem = Request.Form["invoiceItemNumber"];
+        invoiceId = Request.Form["invoiceId"];
+        invoiceDate = Request.Form["invoiceDate"];
+
+        invoiceInfo = new string[] { invoiceId, invoiceDate, numberOfItem };
+
+        for (int i = invoiceInfo.Length - 1; i > -1; i--)
+        {
+            if (Invoice_Logic.IsNotValidString(invoiceInfo[i]))
+            {
+                messageValid = $"{invoiceLabel[i]} chưa được điền!";
+                validResult = false;
+            }
+        }
+
+        if (validResult)
+        {
+            if (Invoice_Logic.IsNotValidNumber(int.Parse(invoiceId)))
+            {
+                messageValid = "Mã hóa đơn phải là số dương";
+                validResult = false;
+            }
+
+            if (invoiceId != Request.Query["invoiceId"])
+            {
+                if (Invoice_Logic.IsNotUniqueIdSales(int.Parse(invoiceId)))
+                {
+                    messageValid = "Mã hóa đơn đã tồn tại!";
+                    validResult = false;
+                }
+            }
+        }
+
+        if (validResult)
+        {
+            Response.Redirect("Edit_itemSalesInvoice?currentId=" + currentInvoiceId + "&numberOfItem=" + numberOfItem + "&invoiceId=" + invoiceId + "&invoiceDate=" + invoiceDate + "&User=" + userGlobal);
+
+        }
+    }
+}
+
+@{
+    ViewData["TitleParent"] = "Hóa đơn bán hàng";
+    ViewData["BreadcrumbsParent"] = "List_SalesInvoice?User=" + userGlobal;
+    ViewData["TitleCurrent"] = "Sửa hóa đơn bán hàng";
+    ViewData["BreadcrumbsCurrent"] = "Edit_SalesInvoice?invoiceId=" + currentInvoice.Id + "&User=" + userGlobal;
+}
+
+@if (!validResult)
+{
+    <div class="valid_notification">
+        <div class="valid_notification_note">
+            <i class='bx bx-info-circle'></i><p class="valid">@messageValid</p>
+        </div>
+    </div>
+}
+<div class="content">
+    <div class="top">
+        <div class="title">SỬA HÓA ĐƠN NHẬP HÀNG</div>
+    </div>
+    <div class="add">
+        <form method="POST">
+            <label for="invoiceId">Mã hóa đơn: </label><span class="validInput">(Mã hóa đơn chỉ có thể là số)</span><br>
+            <input type="number" id="invoiceId" name="invoiceId" value="@currentInvoice.Id"><br>
+            <label for="invoiceDate">Ngày nhập hàng: </label><br>
+            <input type="date" id="invoiceDate" name="invoiceDate" value="@currentInvoice.Date"><br>
+            <label for="invoiceItemNumber">Số lượng sản phẩm của hóa đơn: </label><br>
+            <input type="number" id="invoiceItemNumber" name="invoiceItemNumber" value="@currentInvoice.Items.Length"><br>
+            <input class="submitBtn" type="submit" value="TIẾP TỤC">
+        </form>
+    </div>
+</div>
+<style>
+
+    .content {
+        font-family: Arial, sans-serif;
+        width: 70vw;
+        height: 90vh;
+    }
+
+    .top {
+        width: 70vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+        .top .title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+    .add {
+        display: flex;
+        justify-content: center;
+        background-color: #1F2937;
+        margin: 10px;
+        border-radius: 20px;
+        padding-top: 15px;
+        font-size: 14px;
+        width: 60vw;
+        height: 75vh;
+        overflow: auto;
+    }
+
+        .add form {
+            width: 50vw;
+            height: 72vh;
+            overflow: auto;
+        }
+
+        .add label {
+            margin-top: 20px;
+            font-weight: bold;
+            width: 45vw;
+        }
+
+        .add .validInput {
+            font-style: italic;
+            color: #ffffff;
+        }
+
+    .valid {
+        font-style: italic;
+        color: #D97706;
+    }
+
+    .add input {
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        padding-left: 10px;
+        width: 45vw;
+        height: 30px;
+        background-color: #9CA3AF50;
+        border: 1px solid #374151;
+        border-radius: 5px;
+        margin: 5px 5px 10px 0px;
+    }
+
+    .submitBtn {
+        background-color: #D97706 !important;
+        padding: 10px !important;
+        border-radius: 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        cursor: pointer;
+        width: 50% !important;
+        height: auto !important;
+        font-weight: bold;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 0px !important
+    }
+
+        .submitBtn:hover {
+            background-color: #F59E0B !important;
+        }
+
+    .valid_notification {
+        background: #1F2937;
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #D97706;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .valid_notification_note {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+        .valid_notification_note .bx-info-circle {
+            color: #D97706;
+            font-size: 20px;
+            padding-right: 5px;
+        }
+
+    .valid_notification a {
+        text-decoration: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        background-color: #D97706;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    /*Responsive*/
+    @@media (min-width:610px) and (max-width: 1140px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-width: 610px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+    @@media only screen and (max-height: 560px) {
+        .valid_notification {
+            left: 30%;
+        }
+    }
+
+</style>
+
+

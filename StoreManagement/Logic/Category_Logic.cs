@@ -26,7 +26,7 @@ namespace StoreManagement.Logic
             }
             else
             {
-                for (int i = 0; i < numberCategoriesContainsKeySearch; i++)
+                for (int i = 0; i < listCategories.Length; i++)
                 {
                     if (listCategories[i].Name.Contains(keySearch))
                     {
@@ -155,7 +155,7 @@ namespace StoreManagement.Logic
             }
             else
             {
-                for (int i = 0; i < numberContainsKeySearch; i++)
+                for (int i = 0; i < listCategories.Length; i++)
                 {
                     if (listCategories[i].Id.ToString().Contains(keySearch))
                     {
